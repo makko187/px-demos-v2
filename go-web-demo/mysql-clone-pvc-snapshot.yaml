@@ -1,0 +1,23 @@
+apiVersion: volumesnapshot.external-storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: px-mysql-claim-snapshot-2
+  namespace: default
+spec:
+  persistentVolumeClaimName: px-mysql-snap-clone
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: px-mysql-snap-clone-2
+  annotations:
+    snapshot.alpha.kubernetes.io/snapshot: px-mysql-claim-snapshot-2
+spec:
+  accessModes:
+     - ReadWriteOnce
+  storageClassName: stork-snapshot-sc
+  resources:
+    requests:
+      storage: 10Gi

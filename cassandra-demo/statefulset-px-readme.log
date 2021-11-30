@@ -1,0 +1,70 @@
+#https://kubernetes.io/docs/tutorials/stateful-application/cassandra/
+
+#1 Apply cassandra yaml 
+kubectl apply -f cassandra-service.yaml
+
+#2 Get the Cassandra StatefulSet:
+kubectl get statefulset cassandra
+
+#3 Check Pods
+kubectl get pods -l="app=cassandra"
+
+#4 Run the Cassandra nodetool inside the first Pod, to display the status of the ring.
+kubectl exec -it cassandra-0 -- nodetool status
+
+##The response should look something like:
+Datacenter: DC1-K8Demo
+======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address     Load       Tokens       Owns (effective)  Host ID                               Rack
+UN  172.17.0.5  83.57 KiB  32           74.0%             e2dd09e6-d9d3-477e-96c5-45094c08db0f  Rack1-K8Demo
+UN  172.17.0.4  101.04 KiB  32           58.8%             f89d6835-3a42-4419-92b3-0e62cae1479c  Rack1-K8Demo
+UN  172.17.0.6  84.74 KiB  32           67.1%             a6a1e8c2-3dc5-4417-b1a0-26507af2aaad  Rack1-K8Demo
+
+
+#5 Modifying the Cassandra StatefulSet
+kubectl edit statefulset cassandra
+
+#change is the replicas field = 4. 
+# Please edit the object below. Lines beginning with a '#' will be ignored,
+# and an empty file will abort the edit. If an error occurs while saving this file will be
+# reopened with the relevant failures.
+#
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  creationTimestamp: 2016-08-13T18:40:58Z
+  generation: 1
+  labels:
+  app: cassandra
+  name: cassandra
+  namespace: default
+  resourceVersion: "323"
+  uid: 7a219483-6185-11e6-a910-42010a8a0fc0
+spec:
+  replicas: 3
+
+
+#6 Check scaled pods
+kubectl get statefulset cassandra
+NAME        READY   AGE
+cassandra   0/4     22h
+
+#7 Check scaled pods
+kubectl get pods -o  wide
+NAME          READY   STATUS    RESTARTS   AGE     IP               NODE         NOMINATED NODE   READINESS GATES
+cassandra-0   0/1     Running   0          22h     192.168.70.244   k8-worker3   <none>           <none>
+cassandra-1   0/1     Running   0          22h     192.168.86.137   k8-worker2   <none>           <none>
+cassandra-2   0/1     Running   3          22h     192.168.80.169   k8-worker1   <none>           <none>
+cassandra-3   0/1     Running   0          3m22s   192.168.70.245   k8-worker3   <none>           <none>
+
+#8 Clean UP Statefulset
+grace=$(kubectl get pod cassandra-0 -o=jsonpath='{.spec.terminationGracePeriodSeconds}') \
+  && kubectl delete statefulset -l app=cassandra \
+  && echo "Sleeping ${grace} seconds" 1>&2 \
+  && sleep $grace \
+  && kubectl delete persistentvolumeclaim -l app=cassandra
+
+#9 Delete the Service you set up for Cassandra:
+kubectl delete service -l app=cassandra

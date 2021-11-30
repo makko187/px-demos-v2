@@ -1,0 +1,21 @@
+
+
+##### Deploy PacMan####
+1-mongo-pvc.yaml
+2-secret.yaml
+3-mongo-deployment.yaml
+4-pacman-deployment.yaml
+5-rbac.yaml
+6-mongo-service.yaml
+7-pacman-service.yaml
+
+##### Backup Pacman####
+8-mongo-pvc-snapshot.yaml
+9-pvc-from-snap.yaml
+
+##### Hack!!! #####
+kubectl delete -f 3-mongo-deployment.yaml
+kubectl delete pvc
+
+##### Restore PacMan!! ######## 
+10-restore-mongo-deployment.yaml

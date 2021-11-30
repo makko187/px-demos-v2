@@ -1,0 +1,8 @@
+apiVersion: volumesnapshot.external-storage.k8s.io/v1
+kind: VolumeSnapshot
+metadata:
+  name: px-mongo-claim-snapshot
+  namespace: default
+spec:
+  persistentVolumeClaimName: mongo-storage
+

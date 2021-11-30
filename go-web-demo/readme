@@ -1,0 +1,17 @@
+1. Deploy MySQL DB / PVC
+	kubectl apply -f 1-mysql-deployment-sc-pvc-np-px.yaml
+
+2. Deploy FrontEnd Service / GUI
+	kubectl apply -f 2-gowebapp-deployment-pvc-np.yaml
+
+3. Trigger MySQL pvc snapshot
+	kubectl apply -f 3-mysql-snapshot.yaml
+
+4. Clone snapshot to a PVC
+	kubectl apply -f 4-pvc-from-snap.yaml
+
+5. Corrupt/ Destroy MySQL DB
+	kubectl delete -f 1-mysql-deployment-sc-pvc-np-px.yaml
+
+6. Restore MySQL DB using clone PVC 
+	kubectl apply -f 5-mysql-restore.yaml

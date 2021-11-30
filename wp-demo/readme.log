@@ -1,0 +1,23 @@
+1. Deploy mySQL volume with PX StorageClass: 
+	kubectl apply -f mysql-vol.yaml
+2. Deploy Wordpress Volume with PX StorageClass: 
+	kubectl apply -f wp-vol.yaml
+3. Deploy mySQL Database App: 
+	kubectl apply -f mysql-deploy.yaml
+4. Deploy Wordpress FrontEnd Port: 
+	kubectl apply -f wp-deploy.yaml
+5. Connect to Firefox and goto NodeIP:Port 
+	kubectl get svc
+6. Run command to change to POD name: Change WP  Theme to TwentyFifteen
+	kubectl exec wordpress-7b6bcf9785-9dsn2 -- curl -Lo wp-content/themes/twentyfifteen/header.php https://git.io/fAfod
+	#sample#kubectl exec <wordpress-pod> -- curl -Lo wp-content/themes/twentyfifteen/header.php https://git.io/fAfod
+7. Scale up or down PODs by running: 
+	kubectl scale --replicas=10  deployment/wordpress
+8. Run command to watch PODs scale: 
+	watch kubectl get pods
+
+#Clean Up
+kubectl delete -f mysql-deploy.yaml
+kubectl delete -f wp-deploy.yaml
+kubectl delete -f mysql-vol.yaml
+kubectl delete -f wp-vol.yaml

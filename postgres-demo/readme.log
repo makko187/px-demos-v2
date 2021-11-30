@@ -1,0 +1,58 @@
+Short Procedure using my LAB:
+
+1.	Start postgres app
+	
+	kubectl apply -f 1-postgres-db.yaml
+
+2.	Start postgres web frontend
+	
+	kubectl apply -f 2-k8s-webapp.yaml
+
+3.	Add Data by going to browser and add K8 logos
+	
+	kubctl get svc
+
+4.	Delete postgres pod to simulate pod failures and recovery. Deleting Pods will restart new pods.
+
+	kubectl delete pods <pod>
+
+5.	Check space use in the POD (postgres)
+
+	kubectl exec postgres-86bd79469b-r65z4 -- df -h
+
+	/dev/pxd/pxd842762816152937533  4.9G   59M  4.6G   2% /var/lib/postgresql/data
+
+6.	Increase Postgres Drive to 10G
+
+	kubectl edit pvc postgres-data
+
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: px-postgres-sc
+  volumeMode: Filesystem
+  volumeName: pvc-aa369cdc-f09d-4df2-96e2-8fa8df447733
+
+7.	Goto GUI and count the ds: number = 51
+
+8.	Trigger Snapshot
+
+	kubectl apply -f 3-pg-snapshot.yaml
+	kubectl get volumesnapshot
+	kubectl get volumesnapshotdatas
+
+9.	Assume Data was corrupted
+
+	kubectl delete -f 1-postgres-db.yaml
+
+10.	Clone Snapshot to a PVC
+
+	kubectl apply -f 4-pvc-from-snap.yaml
+
+11.	Restore DB from snapshot
+
+	kubectl create -f 5-postgres-db-restore.yaml
+
